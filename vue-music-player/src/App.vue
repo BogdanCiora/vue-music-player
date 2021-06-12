@@ -6,8 +6,19 @@
 
     <main>
       <section class="player">
-        //The double curly braces are called template strings! Didn't know that
-        <h2 class="song-title">{{ current.title }}</h2>
+        <h2 class="song-title">{{ current.title }} - {{ current.artist }}</h2>
+        <div class="controls">
+          <button class="prev" @click="prev">Prev</button>
+          <button class="play" v-if="!isPlaying" @click="play">Play</button>
+          <button class="pause" v-else @click="pause">Pause</button>
+          <button class="next" @click="next">Next</button>
+        </div>
+      </section>
+      <section class="playlist">
+        <button v-for="song in songs" :key="song.src" @click="play(song)" 
+        :class="(song.src == current.src) ? 'song playing' : 'song'">
+        {{ song.title }} - {{ song.artist }}
+        </button>
       </section>
     </main>
 
@@ -15,49 +26,95 @@
 </template>
 
 <script>
+
 export default {
   name: 'App',
   data () {
     //Controls the state
     return {
+      index: 0,
+      isPlaying: false,
       current: {
-        titile: 'SONG TITLE'
+
       },
       songs: [
       {
-        titile: 'Always with me always with you',
+        title: 'Always with me always with you',
         artist: 'Joe Satriani',
         image: '',
         src: require('./assets/songs/AlwaysWithMeAlwaysWithYou.mp3')
       },
       {
-        titile: 'Another one bites the Dust',
+        title: 'Another one bites the Dust',
         artist: 'Queen',
         image: '',
         src: require('./assets/songs/AnotherOneBitesTheDust.mp3')
       },
       {
-        titile: 'Fool in the rain',
+        title: 'Fool in the rain',
         artist: 'Pink Floyd',
         image: '',
         src: require('./assets/songs/FoolInTheRain.mp3')
       },
       {
-        titile: 'Policy of truth',
+        title: 'Policy of truth',
         artist: 'Depeche Mode',
         image: '',
         src: require('./assets/songs/PolicyOfTruth.mp3')
       },
       {
-        titile: 'Where the eagles learn to fly',
+        title: 'Where the eagles learn to fly',
         artist: 'Pink Cream',
         image: '',
         src: require('./assets/songs/WhereTheEaglesLearnToFly.mp3')
       }
-      ]
+      ],
+      player: new Audio()
     }
+  },
+  //the object of methods
+  methods: {
+    play(song) {
+      if(typeof song.src !== "undefined") {
+        this.current = song;
+
+        this.player.src = this.current.src;
+      }
+
+      this.player.play();
+      this.isPlaying = true;
+    },
+    pause() {
+      this.player.pause();
+      this.isPlaying = false;
+    },
+    prev() {
+      this.index--;
+      if(this.index < 0) {
+        this.index = this.songs.length - 1;
+      }
+
+      this.current = this.songs[this.index];
+      this.play(this.current);
+    },
+    next() {
+      this.index++;
+      if(this.index > this.songs.length - 1) {
+        this.index = 0;
+      }
+
+      this.current = this.songs[this.index];
+      this.play(this.current);
+    },
+  },
+  //lifecycle method
+  created() {
+    this.current = this.songs[this.index];
+    this.player.src = this.current.src;
+    // this.player.play();
   }
 }
+
 </script>
 
 <style>
